@@ -1,0 +1,67 @@
+<% include layout %>
+<script>
+	function going(val)
+	{
+		if(<%=login%>)
+		{
+			$.ajax({
+				type:"POST",
+				url:"/click",
+				data:{
+					data:val
+				},
+				success:function()
+				{
+					var temp="del('"+val+"')";
+					var n=parseInt($("#span"+val).text())+1;
+					$("#span"+val).text(n.toString());
+					$("#div"+val).attr("class","btn del");
+					$("#div"+val).attr("onclick",temp);
+				}
+			});
+		}
+		else
+		{
+			window.location.replace('/login');
+		}
+	}
+	function del(val){
+		$.ajax({
+				type:"POST",
+				url:"/delUser",
+				data:{
+					data:val
+				},
+				success:function()
+				{
+					var temp="going('"+val+"')";
+					var n=parseInt($("#span"+val).text())-1;
+					$("#span"+val).text(n.toString());
+					$("#div"+val).attr("class","btn wrap");
+					$("#div"+val).attr("onclick",temp);
+				}
+			});
+	}
+</script>
+<body>
+	<div class="container">
+		<%data.forEach(function(d){%>
+			<div class="item w2">
+				<%=d.name%>
+				<img src="<%=d.image_url%>" height=150px width=120px>
+				Rating:<%=d.rating%><br>
+				Going:
+				<%if(user){%>
+					<%if(d.user.indexOf(user)!=-1){%>
+						<div class="btn del" id="div<%=d._id%>" onclick="del('<%=d._id%>')">
+					<%}
+					else{%>
+				<div class="btn wrap" id="div<%=d._id%>" onclick="going('<%=d._id%>')">
+					<%}%>
+				<%}%>
+					<span class="hyperspan" id="span<%=d._id%>"><%=d.user.length%></span>
+				</div>
+			</div>
+		<%})%>
+	</div>
+</body>

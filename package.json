@@ -38,7 +38,9 @@
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.4",
     "path": "^0.12.7",
+    "requestify": "^0.2.5",
     "serve-favicon": "^2.4.3",
-    "yelp-api-v3": "^1.5.0"
+    "yelp-api-v3": "^1.5.0",
+    "yelp-fusion": "^1.0.3"
   }
 }

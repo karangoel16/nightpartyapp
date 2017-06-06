@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<% include layout %>
+<script type="text/javascript">
+	var disp=function()
+	{
+		console.log("I am here");
+		$('#wrapper').css({'display':'block'});
+	}
+</script>
+<body>
+	<div class="container" style="padding-left: 400px;">
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="jumbotron text-center">
+					<form method="POST" action="/">
+						<input type="text" name="place" class="input input-lg" placeholder="E.G. GAINESVILLE"><br><br>
+						<input type="submit" class="btn btn-primary" onclick="disp()">
+					</form><br>
+					<div id="wrapper" style="display: none;">
+						<img src="/public/img/down.gif" height="100px" width="100px">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>

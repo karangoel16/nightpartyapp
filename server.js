@@ -9,7 +9,8 @@ var engine = require('ejs-locals');
 var bodyparser = require('body-parser');
 var mongoStore = require('connect-mongo')(session);
 var path = require('path');
-
+var Yelp= require('yelp-fusion');
+var client;
 var app = express();
 require('dotenv').load();
 require('./app/config/passport')(passport);
@@ -17,6 +18,9 @@ require('./app/config/passport')(passport);
 mongoose.connect(process.env.MONGO_URI);
 mongoose.Promise = global.Promise;
 
+var http = require("http");
+
+var request = require('request');
 
 app.use('/controllers', express.static(process.cwd() + '/app/controllers'));
 app.use('/public', express.static(process.cwd() + '/public'));
@@ -42,9 +46,18 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-routes(app, passport);
+var port = process.env.PORT || 8080;
 
-app.get('/error',function(req,res){
+app.listen(port,  function () {
+    Yelp.accessToken(process.env.APP_ID, process.env.APP_SECRET).then(response => {
+    client = Yelp.client(JSON.parse(response.body).access_token);
+    routes(app, passport,client);
+    });
+    console.log('Node.js listening on port ' + port + '...');
+});
+
+
+/*app.get('/error',function(req,res){
 		res.render('error',{login:req.isAuthenticated()});
 	});
 
@@ -61,7 +74,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+/*app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
     	login:req.isAuthenticated(),
@@ -73,8 +86,5 @@ app.use(function(err, req, res, next) {
 /*app.get('*', function(req, res){
   		res.render('404',{login:req.isAuthenticated()});
 	});*/
-var port = process.env.PORT || 8080;
 
-app.listen(port,  function () {
-	console.log('Node.js listening on port ' + port + '...');
-});
+
