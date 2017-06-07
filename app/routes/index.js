@@ -4,6 +4,7 @@ var path = process.cwd();
 var requestify = require('requestify');
 var Places = require('../models/places');
 var CITY = require('../models/city');
+var User = require('../models/users');
 var searchRequest = {
   term:'beer bar night',
   location: 'san francisco, ca'
@@ -19,6 +20,30 @@ module.exports = function (app, passport,client) {
 			res.redirect('/login');
 		}
 	}
+	app.route('/signup')
+		.get(function(req,res){
+			if(req.isAuthenticated())
+			{
+				res.redirect('/');
+			}
+			res.render('signup',{login:false});
+		})
+		.post(function(req,res){
+			var user=new User();
+			user.service="local";
+			user.local.username=req.body.username;
+			user.setPassword(req.body.password);
+			console.log("reached here");
+			user.save(function(err){
+				if(err){
+					console.log(err);
+					return err;
+				}
+				console.log("save local success");
+				res.redirect("/");
+			})
+		});
+
 	app.route('/click')
 		.post(isLoggedIn,function(req,res,next){
 			Places.findOne({_id:req.body.data},function(err,places){
@@ -100,9 +125,13 @@ module.exports = function (app, passport,client) {
 			});
 
 	app.route('/login')
-		.get(function (req, res,next) {
-			res.render('login',{login:false})
-		});
+		.get(function (req, res) {
+			res.render('login',{login:false});
+		})
+		.post(
+			passport.authenticate('local'),function(req,res){
+					res.redirect('/');
+			});	
 
 	app.route('/logout')
 		.get(function (req, res) {
@@ -112,9 +141,26 @@ module.exports = function (app, passport,client) {
 
 	app.route('/profile')
 		.get(isLoggedIn, function (req, res) {
-			res.sendFile(path + '/public/profile.html');
+			res.render('profile',{login:true,user:JSON.stringify(req.user)});
 		});
 
+	app.route('/updateUser')
+		.post(isLoggedIn,function(req,res){
+			User.update({_id:req.user._id},{city:req.body.city,state:req.body.state,displayName:req.body.name},function(err,user){
+				if(err)
+				{
+					console.log(err);
+					return ;
+				}
+				res.json({success : "Updated Successfully", status : 200});
+			});
+		});
+		
+	app.route('/changePassword')
+		.post(isLoggedIn,function(req,res){
+			req.user.setPassword(req.body.password);
+			res.json({success : "Updated Successfully", status : 200});
+		});
 
 
 	app.route('/auth/github')

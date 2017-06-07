@@ -57,7 +57,9 @@
 					<%}
 					else{%>
 				<div class="btn wrap" id="div<%=d._id%>" onclick="going('<%=d._id%>')">
-					<%}%>
+				<%}}
+				else{%>
+					<div class="btn wrap" id="div<%=d._id%>" onclick="going('<%=d._id%>')">
 				<%}%>
 					<span class="hyperspan" id="span<%=d._id%>"><%=d.user.length%></span>
 				</div>
